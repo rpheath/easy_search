@@ -14,7 +14,7 @@ h2. Installation
 
 You can install this as a Rails plugin. Navigate to your project root and type:
 
-git clone git://github.com/rpheath/easy_search.git vendor/plugins/easy_search
+<pre><code>git clone git://github.com/rpheath/easy_search.git vendor/plugins/easy_search</code></pre>
 
 Use it at your own risk. You've been warned.
 
@@ -75,15 +75,14 @@ Note: the above will not compare 'ryan heath' with each of the specified columns
 That would actually only search 'ryan' and 'term' against your columns. @EasySearch@ tries to be somewhat smart about what it searches. And in fact, you can see what @EasySearch@ considers "dull keywords" by doing:
 
 <pre><code>
-# default dull keywords (there are more for real)
-
+# default dull keywords (this is just an example)
 $> RPH::EasySearch::Setup.dull_keywords
 $> => ['a', 'and', 'the']
 </code></pre>
 
 The list is _far from complete_. So if you have words that you'd like to add to the "dull keywords" list (meaning words that would not be searched), you can do so:
 
-<pre></code>
+<pre><code>
 RPH::EasySearch::Setup.config do
   strip_keywords do
     ['what', 'then', 'if', 'is', 'it']
@@ -91,13 +90,13 @@ RPH::EasySearch::Setup.config do
 end
 
 # dull_keywords is now a sum of the defaults plus your custom keywords
-$> RPH::EasySearch::Setup::dull_keywords
+$> RPH::EasySearch::Setup.dull_keywords
 $> => ['a', 'and', 'the', 'what', 'then', 'if', 'is', 'it']
 </code></pre>
 
 Those keywords are appended to the existing list (all duplicates are removed). And if you'd rather your custom list replace the existing defaults entirely, just pass 'true' to the @strip_keywords@ method, like so:
 
-<pre></code>
+<pre><code>
 RPH::EasySearch::Setup.config do
   strip_keywords(true) do
     ['what', 'then', 'if', 'is', 'it']
@@ -105,7 +104,7 @@ RPH::EasySearch::Setup.config do
 end
 
 # dull_keywords is now only your custom keywords
-$> RPH::EasySearch::Setup::dull_keywords
+$> RPH::EasySearch::Setup.dull_keywords
 $> => ['what', 'then', 'if', 'is', 'it']
 </code></pre>
 
