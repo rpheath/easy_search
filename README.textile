@@ -8,7 +8,7 @@ Firstly, let's just get this out of the way. EasySearch is _not_ intended for se
 
 h2. So, Why Build it?
 
-Honestly? Because building these sorts of DSL-ish interfaces to simple things is fun. It's actually a lot of fun. Also, I think it's a reasonable place to start to create something bigger. Often I like to focus on the interface first, then worry about optimization later. But overall, this plugin is more-or-less the result of me messing around with the dynamism of Ruby :-)
+Honestly? Because building these DSL interfaces to simple things is fun. It's actually a lot of fun. Also, I think it's a reasonable place to start for creating something bigger. Generally, I like to focus on the interface first, then worry about optimization later. But overall, this plugin is more-or-less the result of me toying around with the dynamism of Ruby :-)
 
 h2. Installation
 
