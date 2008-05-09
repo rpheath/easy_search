@@ -80,12 +80,12 @@ module RPH
         # TODO: refactor this method to be less complex for such a simple problem.
         def extract(terms)
           terms.gsub!("'", "")
+          emails = strip_emails_from(terms)
           
-          if terms.match(RegExp::EMAIL)
-            emails = strip_emails_from(terms)
+          unless emails.blank?            
             emails.inject(terms.gsub(RegExp::EMAIL, '').scan(/\w+/)) { |t, email| t << email }
           else
-            terms.scan(/\w+/) if emails.blank?
+            terms.scan(/\w+/)
           end
       	end
              
