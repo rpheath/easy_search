@@ -59,7 +59,7 @@ module RPH
         # ActiveRecord objects through the loop
         def build_conditions_for(terms)
           returning([]) do |clause|
-            Setup.settings[@klass].each do |column|
+            Setup.table_settings[@klass].each do |column|
               terms.each do |term|
                 if to_model(@klass).columns.map(&:name).include?(column.to_s)
                   clause << "`#{@klass}`.`#{column}` LIKE '%#{term}%'"
