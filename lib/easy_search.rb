@@ -1,0 +1,102 @@
+%w(constants errors setup validations).each do |f| 
+  require File.join(File.dirname(__FILE__), "easy_search/#{f}")
+end
+
+module RPH
+  module EasySearch
+    def self.included(base)
+      base.send(:extend,  ClassMethods)
+      base.send(:include, InstanceMethods)
+      
+      # before continuing, validate that the models identified (if any) in the 
+      # `Setup.config' block exist and are valid ActiveRecord descendants
+      Validations.validate_settings!
+    end
+    
+    module ClassMethods
+      # "Search.users" translates to "User.find" dynamically
+      def method_missing(name, *args)
+        # instantiate a new instance of self with
+        # the @klass set to the missing method
+        self.new(name.to_sym)
+      end
+    end
+    
+    module InstanceMethods
+      def initialize(klass)
+        @klass = klass
+        
+        # validate that the class derived from the missing method descends from
+        # ActiveRecord and has been "configured" in `Setup.config'
+        # (i.e. "Search.userz.with(...)" where "userz" should have been "users")
+        Validations.validate_class!(@klass)
+      end
+      
+      # used to collect/parse the keywords that are to be searched, and return
+      # the search results (hands off to the Rails finder)
+      #
+      # Example:
+      #   Search.users.with("ryan heath")
+      #   # => <#User ... > or []
+      def with(keywords, options={})
+        return [] if keywords.blank?
+        
+        keywords = extract(keywords)
+        search_terms = (keywords.collect { |k| k.downcase } - Setup.dull_keywords)
+        
+        klass = to_model(@klass)
+        
+        sanitized_sql_conditions = klass.send(:sanitize_sql_for_conditions, build_conditions_for(search_terms))
+        klass.find(:all, :select => "DISTINCT #{@klass.to_s}.*", :conditions => sanitized_sql_conditions, :order => options[:order], :limit => options[:limit])
+      end
+      
+      private
+        # constructs the conditions for the WHERE clause in the SQL statement.
+        # (compares each search term against each specified column)
+        #
+        # ultimately this allows for one giant query rather than several small ones,
+        # alleviating the need to open/close DB connections and instantiate multiple
+        # ActiveRecord objects through the loop
+        def build_conditions_for(terms)
+          returning([]) do |clause|
+            Setup.settings[@klass].each do |column|
+              terms.each do |term|
+                if to_model(@klass).columns.map(&:name).include?(column.to_s)
+                  clause << "`#{@klass}`.`#{column}` LIKE '%#{term}%'"
+                end
+              end
+            end
+          end.join(" OR ")
+      	end    	  
+        
+        # using scan(/\w+/) to parse the words
+        #
+        # emails were being separated (i.e. split on the "@" symbol since it's not a word) 
+        # so that "rheath@test.com" becomes ["rheath", "test.com"] as search terms, when we 
+        # really want to keep emails intact. as a work around, the emails are pulled out before 
+        # the words are scanned, then each email is pushed back into the array as its own criteria.
+        #
+        # TODO: refactor this method to be less complex for such a simple problem.
+        def extract(terms)
+          terms.gsub!("'", "")
+          
+          if terms.match(RegExp::EMAIL)
+            emails = strip_emails_from(terms)
+            emails.inject(terms.gsub(RegExp::EMAIL, '').scan(/\w+/)) { |t, email| t << email }
+          else
+            terms.scan(/\w+/) if emails.blank?
+          end
+      	end
+             
+        # extracts the emails from the keywords
+        def strip_emails_from(text)
+      	  text.split.reject { |t| t.match(RegExp::EMAIL) == nil }
+      	end
+      	
+      	# converts the symbol representation of a table to an actual ActiveRecord model
+      	def to_model(klass)
+      	  klass.to_s.singularize.classify.constantize
+      	end
+    end
+  end
+end

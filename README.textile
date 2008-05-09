@@ -1,0 +1,79 @@
+h1. EasySearch
+
+Easy search provides a convenient DSL for quickly searching your models.
+
+h2. What It's NOT
+
+Firstly, let's just get this out of the way. EasySearch is _not_ intended for search-intensive or high-performance applications. There are plenty of other (awesome) Full Text plugins for that (e.g. acts_as_ferret, sphinx/ultrasphinx, etc). It's not a Full Text solution or anything advanced, it's just an easy, quick-n-dirty search for your models. So if you're looking for a search solution to search your 10 million record database, please, leave now while you still can.
+
+h2. So, Why Build it?
+
+Honestly? Because building these sorts of DSL-ish interfaces to simple things is fun. It's actually a lot of fun. Also, I think it's a reasonable place to start to create something bigger. Often I like to focus on the interface first, then worry about optimization later. But overall, this plugin is more-or-less the result of me messing around with the dynamism of Ruby :-)
+
+h2. Installation
+
+You can install this as a Rails plugin. Navigate to your project root and type:
+
+git clone git://github.com/rpheath/easy_search.git vendor/plugins/easy_search
+
+Use it at your own risk. You've been warned.
+
+h2. General Use Case
+
+Again, please don't attempt to use this if you'll be searching giant databases, as I'd imagine you would need something performance aware, which this is _not_. But. It should work fine for hundreds, thousands, maybe even tens-of-thousands of records. You know, like blogs, small forums, etc.
+
+h3. Configuration
+
+In config/initializers/easy_search_setup.rb, you'd do something like this:
+
+<pre><code>
+RPH::EasySearch::Setup.config do
+  users    :first_name, :last_name, :email, :login
+  projects :title, :description
+  comments :name, :body
+  groups   :name, :description
+end
+</code></pre>
+
+The first part (the "method" call) is the pluralized name of your models (basically, the table names) and the second part is the list of fields that should be searched for that model. For instance, with a configuration such as the above, @EasySearch@ will know when searching the @User@ model, only search against first_name, last_name, email, and login. For @Project@, only search title and description. And so on.
+
+This configuration is important, though, because otherwise @EasySearch@ wouldn't have a clue what to do with your keywords for that specific model. And just to be clear, those methods (i.e. "users", "projects", "comments", and "groups") don't exist anywhere. They're dynamic, so it can be applied to any application. @EasySearch@ is smart like that.
+
+And of course, should you try to search a model that has not been configured, @EasySearch@ will let you know :-)
+
+h2. Examples
+
+We'll go straight into it. First thing, you install the plugin. Then you add a generic class and give it the @EasySearch@ functionality. Like so:
+
+<pre><code>
+# app/models/search.rb
+class Search
+  include RPH::EasySearch
+end
+</pre></code>
+
+Now we have a @Search@ class that can easily handle search your @ActiveRecord@ models! Let's see some usage...
+
+h3. Usage
+
+In words, let's say we want to "search the users table with 'ryan heath'". To represent that in code, it's basically the same thing:
+
+<pre><code>Search.users.with('ryan heath')</code></pre>
+
+That will not compare 'ryan heath' with each of the specified columns, but it will compare 'ryan' and 'heath' separately against each of the specified columns. Sweet! Another thing worthy of mention about keyword splitting. It's slightly more sophisticated, in that it will strip out the dull keywords that would return innaccurate results and dig into the performance. For instance:
+
+<pre><code>Search.users.with('ryan and a term')</code></pre>
+
+That would actually only search 'ryan' and 'term' against your columns. @EasySearch@ tries to be somewhat smart about what it searches. Moving on...
+
+As another straight-forward example, let's say we want to find all of the projects related to 'NASA'.
+
+<pre><code>Search.projects.with('NASA')</code></pre>
+
+Pretty easy, huh?
+
+Again, this plugin is not meant for searching high-volume Databases. It doesn't handle indexing or any of the other things a full-text solution might handle. But it was a fun plugin to write, and it's a fun API/DSL to use, IMHO(In My Humble Opinion).
+
+h2. License
+
+Copyright (c) 2008 Ryan Heath, released under the MIT license
