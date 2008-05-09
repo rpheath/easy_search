@@ -1,6 +1,6 @@
 h1. EasySearch
 
-Easy search provides a convenient DSL for quickly searching your models.
+Easy search provides a convenient DSL for quickly searching your @ActiveRecord@ models.
 
 h2. What It's NOT
 
