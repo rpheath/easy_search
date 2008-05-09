@@ -2,6 +2,7 @@ module RPH
   module EasySearch
     class Setup
       class << self
+        
         # accepts a block that specifies the columns
         # to search for each model
         #
@@ -28,6 +29,7 @@ module RPH
           self.class_eval(&block)
           self.table_settings          
         end
+        
         # allows customization of the dull_keywords setting
         # (can be overwritten or appended)
         #
@@ -38,17 +40,13 @@ module RPH
         #     strip_keywords do
         #       ['it', 'why', 'is']
         #     end
-        #
-        #     $> Setup.dull_keywords
-        #     $> => ['the', 'and', 'it', 'why', 'is']
+        #     # => ['the', 'and', 'it', 'why', 'is']
         #
         #  2) overwriting existing keywords
         #     strip_keywords(true) do
         #       ['something', 'whatever']
         #     end
-        #
-        #     $> Setup.dull_keywords
-        #     $> => ['something', 'whatever']
+        #     # => ['something', 'whatever']
         def strip_keywords(overwrite=false, &block)
           return nil unless block_given?
           raise(InvalidDullKeywordsType, InvalidDullKeywordsType.message) unless block.call.is_a?(Array)
@@ -56,6 +54,7 @@ module RPH
           overwrite ? @@dull_keywords = block.call : @@dull_keywords = (self.dull_keywords << block.call)
           self.dull_keywords
         end
+        
         # returns a hash with the key as the models to be searched
         # and the value as an array of columns for that model
         #
