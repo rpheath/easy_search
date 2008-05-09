@@ -7,15 +7,27 @@ module RPH
         #
         # Example:
         #   Setup.config do
-        #     users    :first_name, :last_name, :email
-        #     projects :title, :description
+        #     setup_tables { ... }
+        #     strip_keywords { ... }
         #   end
         def config(&block)
           return nil unless block_given?
           self.class_eval(&block)
-          self.settings
         end
         
+        # accepts a block that specifies the columns
+        # to search for each model
+        #
+        # Example:
+        #   setup_tables do
+        #     users    :first_name, :last_name, :email
+        #     projects :title, :description
+        #   end
+        def setup_tables(&block)
+          return nil unless block_given?
+          self.class_eval(&block)
+          self.table_settings          
+        end
         # allows customization of the dull_keywords setting
         # (can be overwritten or appended)
         #
@@ -50,8 +62,8 @@ module RPH
         # Example:
         #   $> Setup.settings
         #   $> => {"users"=>[:first_name, :last_name, :email], "projects"=>[:title, :description]}
-        def settings
-          @@settings ||= HashWithIndifferentAccess.new
+        def table_settings
+          @@table_settings ||= HashWithIndifferentAccess.new
         end
         
         # returns an array of keywords that serve as no benefit in a search
@@ -69,7 +81,7 @@ module RPH
         # key set to the table, and the value set to the columns. this allows the
         # EasySearch plugin to work generically for any code base.
         def method_missing(table, *fields)
-          settings[table] = fields
+          table_settings[table] = fields
         end
       end
     end

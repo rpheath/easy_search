@@ -6,8 +6,8 @@ module RPH
       # it ensures that any/all models in the settings hash exist
       # and decend from ActiveRecord::Base
       def self.validate_settings!
-        unless Setup.settings.blank?
-          Setup.settings.keys.each do |klass|
+        unless Setup.table_settings.blank?
+          Setup.table_settings.keys.each do |klass|
             unless klass.to_s.singularize.classify.constantize.descends_from_active_record?
               raise( InvalidActiveRecordModel, InvalidActiveRecordModel.message )
             end
@@ -29,11 +29,11 @@ module RPH
     	
     	private
     	  def self.valid_model?(klass)
-      	  klass.to_s.singularize.classify.constantize.descends_from_active_record?# rescue false
+      	  klass.to_s.singularize.classify.constantize.descends_from_active_record? rescue false
       	end
     	
       	def self.model_has_settings?(klass)
-      	  !Setup.settings[klass].blank? rescue false
+      	  !Setup.table_settings[klass].blank? rescue false
       	end
     end
   end
