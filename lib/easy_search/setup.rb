@@ -7,7 +7,7 @@ module RPH
         #
         # Example:
         #   Setup.config do
-        #     setup_tables { ... }
+        #     setup_tables   { ... }
         #     strip_keywords { ... }
         #   end
         def config(&block)
@@ -35,7 +35,7 @@ module RPH
         #   DEFAULT_DULL_KEYWORDS = ['the', 'and', 'is']
         # 
         #  1) appending keywords to the default list
-        #     Setup.strip_keywords do
+        #     strip_keywords do
         #       ['it', 'why', 'is']
         #     end
         #
@@ -43,7 +43,7 @@ module RPH
         #     $> => ['the', 'and', 'it', 'why', 'is']
         #
         #  2) overwriting existing keywords
-        #     Setup.strip_keywords(true) do
+        #     strip_keywords(true) do
         #       ['something', 'whatever']
         #     end
         #
@@ -79,7 +79,7 @@ module RPH
         # once the block is eval'd those missing methods (i.e. "users" and "projects")
         # will be passed here and the settings hash will be updated with the
         # key set to the table, and the value set to the columns. this allows the
-        # EasySearch plugin to work generically for any code base.
+        # EasySearch plugin to work generically for any rails application.
         def method_missing(table, *fields)
           table_settings[table] = fields
         end

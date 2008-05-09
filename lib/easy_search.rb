@@ -9,7 +9,7 @@ module RPH
       base.send(:include, InstanceMethods)
       
       # before continuing, validate that the models identified (if any) in the 
-      # `Setup.config' block exist and are valid ActiveRecord descendants
+      # setup_tables block (within `Setup.config') exist and are valid ActiveRecord descendants
       Validations.validate_settings!
     end
     
@@ -27,8 +27,8 @@ module RPH
         @klass = klass
         
         # validate that the class derived from the missing method descends from
-        # ActiveRecord and has been "configured" in `Setup.config'
-        # (i.e. "Search.userz.with(...)" where "userz" should have been "users")
+        # ActiveRecord and has been "configured" in `Setup.config { setup_tables {...} }'
+        # (i.e. "Search.userz.with(...)" where "userz" is an invalid model)
         Validations.validate_class!(@klass)
       end
       
@@ -50,11 +50,14 @@ module RPH
       
       private
         # constructs the conditions for the WHERE clause in the SQL statement.
-        # (compares each search term against each specified column)
+        # (compares each search term against each configured column for that model)
         #
-        # ultimately this allows for one giant query rather than several small ones,
+        # ultimately this allows for a single query rather than several small ones,
         # alleviating the need to open/close DB connections and instantiate multiple
         # ActiveRecord objects through the loop
+        #
+        # it should be noted that a search with too many keywords against too many columns
+        # in a DB with too many rows will inevitably hurt performance (use ultrasphinx!)
         def build_conditions_for(terms)
           returning([]) do |clause|
             Setup.table_settings[@klass].each do |column|
@@ -69,8 +72,8 @@ module RPH
         
         # using scan(/\w+/) to parse the words
         #
-        # emails were being separated (i.e. split on the "@" symbol since it's not a word) 
-        # so that "rheath@test.com" becomes ["rheath", "test.com"] as search terms, when we 
+        # emails were being separated (split on the "@" symbol since it's not a word) 
+        # so "rheath@test.com" became ["rheath", "test.com"] as search terms, when we 
         # really want to keep emails intact. as a work around, the emails are pulled out before 
         # the words are scanned, then each email is pushed back into the array as its own criteria.
         #
