@@ -136,11 +136,11 @@ describe "EasySearch" do
     end
     
     it "should not search dull keywords" do
-      search('ryan a but and or heath').should eql(['ryan', 'heath'])
+      search('ryan a the and or heath').should eql(['ryan', 'heath'])
     end
     
     it "should return an empty array if all keywords are dull" do
-      search('a but and or').should eql([])
+      search('a the and or').should eql([])
     end
     
     it "should remove any conflicting apostrophe's in search terms" do
@@ -152,7 +152,7 @@ describe "EasySearch" do
     end
     
     it "should pull out dull keywords even if they're uppercase" do
-      search('ryan A BUT AND OR').should eql(['ryan'])
+      search('ryan A THE AND OR').should eql(['ryan'])
     end
   end
   
