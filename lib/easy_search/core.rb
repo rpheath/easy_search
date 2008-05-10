@@ -58,10 +58,12 @@ module RPH
         # it should be noted that a search with too many keywords against too many columns
         # in a DB with too many rows will inevitably hurt performance (use ultrasphinx!)
         def build_conditions_for(terms)
+          klass = to_model(@klass)
+          
           returning([]) do |clause|
             Setup.table_settings[@klass].each do |column|
               terms.each do |term|
-                if to_model(@klass).columns.map(&:name).include?(column.to_s)
+                if klass.columns.map(&:name).include?(column.to_s)
                   clause << "`#{@klass}`.`#{column}` LIKE '%#{term}%'"
                 end
               end
