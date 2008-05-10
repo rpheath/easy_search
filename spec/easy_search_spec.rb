@@ -127,32 +127,45 @@ describe "EasySearch" do
   end
   
   describe "search terms" do
-    def search(terms)
+    def extract(terms)
       Search.new(:users).send(:extract, terms)
     end
     
+    def strip_emails_from(text)
+      Search.new(:users).send(:strip_emails_from, text)
+    end
+    
     it "should separate terms when parsing search terms" do
-      search('ryan heath').should eql(['ryan', 'heath'])
+      extract('ryan heath').should eql(['ryan', 'heath'])
     end
     
     it "should not search dull keywords" do
-      search('ryan a the and or heath').should eql(['ryan', 'heath'])
+      extract('ryan a the and or heath').should eql(['ryan', 'heath'])
     end
     
     it "should return an empty array if all keywords are dull" do
-      search('a the and or').should eql([])
+      extract('a the and or').should eql([])
     end
     
     it "should remove any conflicting apostrophe's in search terms" do
-      search("ryan's stuff").should eql(['ryans', 'stuff'])
+      extract("ryan's stuff").should eql(['ryans', 'stuff'])
     end
     
     it "should keep emails intact when contained within search terms" do
-      search('ryan rph@test.com heath').should eql(['ryan', 'heath', 'rph@test.com'])
+      extract('ryan rph@test.com heath').should eql(['ryan', 'heath', 'rph@test.com'])
     end
     
     it "should pull out dull keywords even if they're uppercase" do
-      search('ryan A THE AND OR').should eql(['ryan'])
+      extract('ryan A THE AND OR').should eql(['ryan'])
+    end
+    
+    it "should pull out the emails from the search terms" do
+      strip_emails_from('ryan rph@test.com rph@other.com').
+        should eql(['rph@test.com', 'rph@other.com'])
+    end
+    
+    it "should not have any emails to pull out of the search terms" do
+      strip_emails_from('ryan heath').should eql([])
     end
   end
   
