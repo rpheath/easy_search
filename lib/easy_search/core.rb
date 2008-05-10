@@ -39,8 +39,7 @@ module RPH
       #   Search.users.with("ryan heath")
       #   # => <#User ... > or []
       def with(keywords, options={})
-        keywords = extract(keywords)
-        search_terms = (keywords.collect { |k| k.downcase } - Setup.dull_keywords.collect { |k| k.downcase })
+        search_terms = extract(keywords)        
         return [] if search_terms.blank?
         
         klass = to_model(@klass)
@@ -82,11 +81,13 @@ module RPH
           terms.gsub!("'", "")
           emails = strip_emails_from(terms)
           
-          unless emails.blank?            
+          keywords = unless emails.blank?            
             emails.inject(terms.gsub(RegExp::EMAIL, '').scan(/\w+/)) { |t, email| t << email }
           else
             terms.scan(/\w+/)
           end
+          
+          return (keywords.collect { |k| k.downcase } - Setup.dull_keywords.collect { |k| k.downcase })
       	end
              
         # extracts the emails from the keywords

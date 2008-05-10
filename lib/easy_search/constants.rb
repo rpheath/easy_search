@@ -9,6 +9,6 @@ module RPH
     # these keywords will be removed from any search terms, as they
     # provide no value and just increase the size of the query.
     # (the idea is a small attempt to be as efficient as possible)
-    DEFAULT_DULL_KEYWORDS = ['a', 'the', 'and', 'but', 'or', 'so', 'what']
+    DEFAULT_DULL_KEYWORDS = ['a', 'the', 'and', 'or']
   end
 end
