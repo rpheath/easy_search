@@ -4,11 +4,11 @@ Easy search provides a convenient DSL for quickly searching your @ActiveRecord@ 
 
 h2. What It's NOT
 
-Firstly, let's just get this out of the way. EasySearch is _not_ intended for search-intensive or high-performance applications. There are plenty of other (awesome) Full Text plugins for that (e.g. acts_as_ferret, sphinx/ultrasphinx, etc). It's just an easy, quick-n-dirty search for your @ActiveRecord@ models. So if you're looking for a search solution to hunt through your 10 million record database, please, leave now while you still can.
+Firstly, let's just get this out of the way. EasySearch is _not_ intended for search-intensive or high-performance applications. There are plenty of other (awesome) full-text plugins for that (e.g. acts_as_ferret, sphinx/ultrasphinx, etc). It's just an easy, quick-n-dirty search for your @ActiveRecord@ models. So if you're looking for a search solution to hunt through your 10 million record database, please, leave now while you still can.
 
 h2. So, Why Build it?
 
-Honestly? Because building these DSL interfaces to simple things is fun. It's actually a lot of fun. Also, I think it's a reasonable place to start for creating something bigger. Generally, I like to focus on the interface first, then worry about optimization later. But overall, this plugin is more-or-less the result of me toying around with the dynamism of Ruby :-)
+Honestly? Because building a DSL interface to a simple thing is fun. It's actually a lot of fun. Also, I think it's a reasonable place to start for creating something bigger. Overall, this plugin is more-or-less the result of me toying around with the dynamism of Ruby :-)
 
 h2. Installation
 
@@ -37,9 +37,7 @@ RPH::EasySearch::Setup.config do
 end
 </code></pre>
 
-The first part (the "method" call) is the pluralized name of your models (the table names) and the second part is the list of fields that should be searched for that model. For instance, with a configuration such as the above, @EasySearch@ will know when searching the @User@ model, only check against first_name, last_name, email, and login. For @Project@, only search title and description. And so on.
-
-This configuration is important, though, because otherwise @EasySearch@ wouldn't have a clue what to do with your keywords for that specific model. And just to be clear, those methods (i.e. "users", "projects", "comments", and "groups") don't exist anywhere. They're dynamic, so it can be applied to any application. @EasySearch@ is smart like that.
+The @setup_tables@ method allows you to specify which columns should be searched for each one of your tables. It's required if you want to use @EasySearch@ with one of your models. Otherwise, @EasySearch@ wouldn't have a clue what to do with your keywords.
 
 And of course, should you try to search a model that has not been configured, @EasySearch@ will let you know :-)
 
@@ -54,7 +52,7 @@ class Search
 end
 </pre></code>
 
-Now we have a @Search@ class that can easily handle search your @ActiveRecord@ models! Let's see some usage...
+Now we have a @Search@ class that can easily handle search your @ActiveRecord@ models! Notice how this class _does not_ descend from @ActiveRecord@.
 
 h3. Usage
 
@@ -68,11 +66,11 @@ $> Search.projects.with('webdesign')
 $> => [<#Project ...>, <#Project ...>, ...]
 </code></pre>
 
-Note: the above will not compare 'ryan heath' with each of the specified columns, but it will compare 'ryan' and 'heath' separately against each of the specified columns for better results. Another thing worthy of mention about keyword splitting: it's slightly more sophisticated, in that it will strip out the dull keywords that would return innaccurate results and dig into the performance. For instance:
+Note: the above will not compare 'ryan heath' with each of the configured columns, but it will compare 'ryan' and 'heath' separately against each of those columns for better results. Another thing worthy of mention about keyword splitting: it's slightly more sophisticated, in that it will strip out the dull keywords that would return innaccurate results, which also helps performance. For instance:
 
 <pre><code>Search.users.with('ryan and a term')</code></pre>
 
-That would actually only search 'ryan' and 'term' against your columns. @EasySearch@ tries to be somewhat smart about what it searches. And in fact, you can see what @EasySearch@ considers "dull keywords" by doing:
+That would only search 'ryan' and 'term' against your columns. @EasySearch@ tries to be somewhat smart about what it searches. And in fact, you can see what @EasySearch@ considers "dull keywords" by doing:
 
 <pre><code>
 # default dull keywords (this is just an example)
@@ -80,7 +78,7 @@ $> RPH::EasySearch::Setup.dull_keywords
 $> => ['a', 'and', 'the']
 </code></pre>
 
-The list is _far from complete_. So if you have words that you'd like to add to the "dull keywords" list (meaning words that would not be searched), you can do so:
+The list is _far from complete_. So if you have words that you'd like to add to the "dull keywords" list (meaning words that would not be searched), you can do so quite easily. Going back to the @Setup.config@ block:
 
 <pre><code>
 RPH::EasySearch::Setup.config do
