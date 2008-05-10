@@ -126,6 +126,36 @@ describe "EasySearch" do
     end
   end
   
+  describe "search terms" do
+    def search(terms)
+      Search.new(:users).send(:extract, terms)
+    end
+    
+    it "should separate terms when parsing search terms" do
+      search('ryan heath').should eql(['ryan', 'heath'])
+    end
+    
+    it "should not search dull keywords" do
+      search('ryan a but and or heath').should eql(['ryan', 'heath'])
+    end
+    
+    it "should return an empty array if all keywords are dull" do
+      search('a but and or').should eql([])
+    end
+    
+    it "should remove any conflicting apostrophe's in search terms" do
+      search("ryan's stuff").should eql(['ryans', 'stuff'])
+    end
+    
+    it "should keep emails intact when contained within search terms" do
+      search('ryan rph@test.com heath').should eql(['ryan', 'heath', 'rph@test.com'])
+    end
+    
+    it "should pull out dull keywords even if they're uppercase" do
+      search('ryan A BUT AND OR').should eql(['ryan'])
+    end
+  end
+  
   describe "errors" do    
     it "should raise NoModelError if a model (constant) cannot be found" do
       EZS::Setup.config { setup_tables { wrong :first, :last } }
@@ -147,8 +177,8 @@ describe "EasySearch" do
     
     it "should raise InvalidDullKeywordsType error if something other than an array is passed to strip_keywords" do
       EZS::Setup.config { strip_keywords { {'something' => 'else'} } } rescue EZS::InvalidDullKeywordsType; true
-      EZS::Setup.config { strip_keywords { ''                      } } rescue EZS::InvalidDullKeywordsType; true
-      EZS::Setup.config { strip_keywords { nil                     } } rescue EZS::InvalidDullKeywordsType; true
+      EZS::Setup.config { strip_keywords { '' } } rescue EZS::InvalidDullKeywordsType; true
+      EZS::Setup.config { strip_keywords { nil } } rescue EZS::InvalidDullKeywordsType; true
     end
   end
 end
