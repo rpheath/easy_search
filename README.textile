@@ -106,6 +106,13 @@ $> RPH::EasySearch::Setup.dull_keywords
 $> => ['what', 'then', 'if', 'is', 'it']
 </code></pre>
 
+And finally, if you have additional conditions that you need to apply to all search results, just use a :conditions option on the @with@ method, like so:
+
+<pre><code>
+$> Search.users.with('ryan heath', :conditions => 'active => 1')
+$> # active users matching 'ryan' and/or 'heath'
+</code></pre>
+
 Pretty easy, huh?
 
 Again, this plugin is not meant for searching high-volume Databases. It doesn't handle indexing or any of the other things a full-text solution might handle. But it was a fun plugin to write, and it's a fun API/DSL to use, and that's why I wrote it.
