@@ -43,7 +43,11 @@ module RPH
         return [] if search_terms.blank?
         
         klass = to_model(@klass)
-        sanitized_sql_conditions = klass.send(:sanitize_sql_for_conditions, build_conditions_for(search_terms))
+        
+        conditions = "(#{build_conditions_for(search_terms)})"
+        conditions << " AND (#{options[:conditions]})" unless options[:conditions].blank?
+        sanitized_sql_conditions = klass.send(:sanitize_sql_for_conditions, conditions)
+
         klass.find(:all, :select => "DISTINCT #{@klass.to_s}.*", :conditions => sanitized_sql_conditions, :order => options[:order], :limit => options[:limit])
       end
       
