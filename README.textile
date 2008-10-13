@@ -68,7 +68,7 @@ $> => [<#Project ...>, <#Project ...>, ...]
 
 Note: the above will not compare 'ryan heath' with each of the configured columns, but it will compare 'ryan' and 'heath' separately against each of those columns for better results. Another thing worthy of mention about keyword splitting: it's slightly more sophisticated, in that it will strip out the dull keywords that would return innaccurate results, which also helps performance. For instance:
 
-You can also search by an exact phrase. Let's say you wanted to support a search for '"ryan heath"', where you didn't want it to search "ryan" and "heath" separately. Well, it automatically does. Just let your users know that all they have to do is wrap their search terms around quotes (just like Google) and it will be an exact search match.
+You can also search by an exact phrase. Let's say you wanted to support a search for '"ryan heath"', where you didn't want EasySearch to search "ryan" and "heath" separately. Well, all you have to do is tell your users to wrap their search terms in quotes (just like Google) and EasySearch will know to search that phrase, in that order, without splitting up the words.
 
 <pre><code>Search.users.with('ryan and a term')</code></pre>
 
