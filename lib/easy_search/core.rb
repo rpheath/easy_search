@@ -39,7 +39,7 @@ module RPH
       #   Search.users.with("ryan heath")
       #   # => <#User ... > or []
       def with(keywords, options={})
-        search_terms = keywords.match(/"(.+)"/) ? extract(keywords, :exact => true) : extract(keywords)
+        search_terms = keywords.match(/"(.+)"/) ? extract($1, :exact => true) : extract(keywords)
         return [] if search_terms.blank?
         
         klass = to_model(@klass)
@@ -84,7 +84,7 @@ module RPH
         #
         # TODO: refactor this method to be less complex for such a simple problem.
         def extract(terms, options={})
-          return [terms.gsub('"', '')] if options[:exact]
+          return [terms] if options[:exact]
           
           terms.gsub!("'", "")
           emails = strip_emails_from(terms)
