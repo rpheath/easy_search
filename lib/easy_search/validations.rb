@@ -8,12 +8,13 @@ module RPH
       def self.validate_settings!
         unless Setup.table_settings.blank?
           Setup.table_settings.keys.each do |klass|
-            unless klass.to_s.singularize.classify.constantize.descends_from_active_record?
+            unless klass.to_s.classify.constantize.ancestors.include?(ActiveRecord::Base)
               raise( InvalidActiveRecordModel, InvalidActiveRecordModel.message )
             end
           end
         end
       rescue NameError
+        raise $!
         raise( NoModelError, "you've specified a table in your `Setup.config' block that doesn't exist" )
       end
       
@@ -29,7 +30,7 @@ module RPH
     	
     	private
     	  def self.valid_model?(klass)
-      	  klass.to_s.singularize.classify.constantize.descends_from_active_record? rescue false
+      	  klass.to_s.singularize.classify.constantize.ancestors.include?(ActiveRecord::Base) rescue false
       	end
     	
       	def self.model_has_settings?(klass)

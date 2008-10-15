@@ -48,7 +48,7 @@ module RPH
         conditions << " AND (#{options[:conditions]})" unless options[:conditions].blank?
         sanitized_sql_conditions = klass.send(:sanitize_sql_for_conditions, conditions)
 
-        klass.find(:all, :select => "DISTINCT #{@klass.to_s}.*", :conditions => sanitized_sql_conditions, :order => options[:order], :limit => options[:limit])
+        klass.find(:all, :select => "DISTINCT #{klass.table_name}.*", :conditions => sanitized_sql_conditions, :order => options[:order], :limit => options[:limit])
       end
       
       private
@@ -68,7 +68,7 @@ module RPH
             Setup.table_settings[@klass].each do |column|
               terms.each do |term|
                 if klass.columns.map(&:name).include?(column.to_s)
-                  clause << "`#{@klass}`.`#{column}` LIKE '%#{term}%'"
+                  clause << "`#{klass.table_name}`.`#{column}` LIKE '%#{term}%'"
                 end
               end
             end
