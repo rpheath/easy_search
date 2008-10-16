@@ -48,7 +48,9 @@ module RPH
         conditions << " AND (#{options[:conditions]})" unless options[:conditions].blank?
         sanitized_sql_conditions = klass.send(:sanitize_sql_for_conditions, conditions)
 
-        klass.find(:all, :select => "DISTINCT #{klass.table_name}.*", :conditions => sanitized_sql_conditions, :order => options[:order], :limit => options[:limit])
+        options = { :select => 'DISTINCT *', :conditions => sanitized_sql_conditions, :order => options[:order], :limit => options[:limit] }
+        options.update :include => associations_to_include
+        klass.find(:all, options)
       end
       
       private
@@ -66,14 +68,36 @@ module RPH
           
           returning([]) do |clause|
             Setup.table_settings[@klass].each do |column|
-              terms.each do |term|
-                if klass.columns.map(&:name).include?(column.to_s)
-                  clause << "`#{klass.table_name}`.`#{column}` LIKE '%#{term}%'"
+              # handle search associated objects
+              if Hash === column
+                column.each do |association, columns|
+                  reflection = klass.reflect_on_association(association.to_sym)
+                  next unless reflection
+                  model = reflection.class_name.constantize
+                  columns.each do |associated_column|
+                    clause << build_conditions_for_terms_on_model(model, associated_column, terms)
+                  end  
                 end
-              end
+              else
+                clause << build_conditions_for_terms_on_model(klass, column, terms)
+              end  
             end
-          end.join(" OR ")
-      	end    	  
+          end.flatten.join(" OR ")
+      	end
+      	
+      	def build_conditions_for_terms_on_model(klass, column, terms)
+          terms.inject([]) do |clause, term|
+            if klass.columns.map(&:name).include?(column.to_s)
+              clause << "`#{klass.table_name}`.`#{column}` LIKE '%#{term}%'"
+            end
+          end
+      	end
+      	
+      	def associations_to_include
+        	includes = Setup.table_settings[@klass].collect do |e| 
+        	  Hash === e ? e.keys : nil
+        	end.compact || []
+        end	
         
         # using scan(/\w+/) to parse the words
         #
