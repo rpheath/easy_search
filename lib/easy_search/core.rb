@@ -108,13 +108,13 @@ module RPH
         #
         # TODO: refactor this method to be less complex for such a simple problem.
         def extract(terms, options={})
-          return [terms] if options[:exact]
+          return [terms] if options.delete(:exact)
           
           terms.gsub!("'", "")
           emails = strip_emails_from(terms)
           
           keywords = unless emails.blank?            
-            emails.inject(terms.gsub(RegExp::EMAIL, '').scan(/\w+/)) { |t, email| t << email }
+            emails.inject(terms.gsub(Regex.email, '').scan(/\w+/)) { |t, email| t << email }
           else
             terms.scan(/\w+/)
           end
@@ -124,7 +124,7 @@ module RPH
              
         # extracts the emails from the keywords
         def strip_emails_from(text)
-      	  text.split.reject { |t| t.match(RegExp::EMAIL) == nil }
+      	  text.split.reject { |t| t.match(Regex.email) == nil }
       	end
       	
       	# converts the symbol representation of a table to an actual ActiveRecord model

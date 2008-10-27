@@ -18,7 +18,7 @@ module RPH
         #   $> Setup.dull_keywords
         #   $> => ['a', 'and', 'but', 'the', ...]
         def dull_keywords
-          (@@dull_keywords ||= DEFAULT_DULL_KEYWORDS).flatten.uniq
+          (@@dull_keywords ||= Defaults.dull_keywords).flatten.uniq
         end
         
         # accepts a block that specifies the columns
