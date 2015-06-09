@@ -93,7 +93,7 @@ module EasySearch
     	end
     	
     	def associations_to_include
-      	includes = Setup.table_settings[@klass].collect do |e| 
+      	Setup.table_settings[@klass].collect do |e| 
       	  Hash === e ? e.keys : nil
       	end.compact || []
       end	
