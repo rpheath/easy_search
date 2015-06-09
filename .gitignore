@@ -2,3 +2,4 @@ coverage
 rdoc*
 rdoc/*
 .DS_Store
+pkg
