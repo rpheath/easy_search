@@ -27,7 +27,7 @@ h3. Configuration
 In config/initializers/easy_search_setup.rb (or config/environment.rb if you aren't running Rails 2.0+), you'd do something like this:
 
 <pre><code>
-RPH::EasySearch::Setup.config do
+EasySearch::Setup.config do
   setup_tables do
     users    :first_name, :last_name, :email, :login
     projects :title, :description
@@ -48,7 +48,7 @@ We'll go straight into it. First thing, you install the plugin. Then you add a g
 <pre><code>
 # app/models/search.rb
 class Search
-  include RPH::EasySearch
+  include EasySearch
 end
 </pre></code>
 
@@ -76,35 +76,35 @@ That would only search 'ryan' and 'term' against your columns. @EasySearch@ trie
 
 <pre><code>
 # default dull keywords (this is just an example)
-$> RPH::EasySearch::Setup.dull_keywords
+$> EasySearch::Setup.dull_keywords
 $> => ['a', 'and', 'the']
 </code></pre>
 
 The list is _far from complete_. So if you have words that you'd like to add to the "dull keywords" list (meaning words that would not be searched), you can do so quite easily. Going back to the @Setup.config@ block:
 
 <pre><code>
-RPH::EasySearch::Setup.config do
+EasySearch::Setup.config do
   strip_keywords do
     ['what', 'then', 'if', 'is', 'it']
   end
 end
 
 # dull_keywords is now a sum of the defaults plus your custom keywords
-$> RPH::EasySearch::Setup.dull_keywords
+$> EasySearch::Setup.dull_keywords
 $> => ['a', 'and', 'the', 'what', 'then', 'if', 'is', 'it']
 </code></pre>
 
 Those keywords are appended to the existing list (all duplicates are removed). And if you'd rather your custom list replace the existing defaults entirely, just pass 'true' to the @strip_keywords@ method, like so:
 
 <pre><code>
-RPH::EasySearch::Setup.config do
+EasySearch::Setup.config do
   strip_keywords(true) do
     ['what', 'then', 'if', 'is', 'it']
   end
 end
 
 # dull_keywords is now only your custom keywords
-$> RPH::EasySearch::Setup.dull_keywords
+$> EasySearch::Setup.dull_keywords
 $> => ['what', 'then', 'if', 'is', 'it']
 </code></pre>
 
